@@ -14,18 +14,21 @@ const {
   INITIAL_GUI_WIDTH,
   INITIAL_GUI_HEIGHT,
   INITIAL_GUI_POSITION_LEFT,
-  INITIAL_GUI_POSITION_TOP
+  INITIAL_GUI_POSITION_TOP,
+  WEB_SOCKET_MESSAGE_TYPE_CONFIG,
+  WEB_SOCKET_MESSAGE_TYPE_RELOAD,
+  WEB_SOCKET_MESSAGE_TYPE_NAVIGATE
 } = constants;
 const hostname = '127.0.0.1';
 
 class GUI {
-  static launch(dir) {
-    GUI.startHttpServer(dir);
-    GUI.startWebSocketServer(dir);
+  static launch(rootDir, reloadCallback, navigateCallback) {
+    GUI.startHttpServer(rootDir);
+    GUI.startWebSocketServer(rootDir, reloadCallback, navigateCallback);
     GUI.launchChrome();
   }
 
-  static startHttpServer(dir) {
+  static startHttpServer(rootDir) {
     const server = http.createServer((req, res) => {
       const pathname = url.parse(req.url, true).pathname;
 
@@ -36,7 +39,7 @@ class GUI {
       res.setHeader('Access-Control-Allow-Headers', '*');
       res.statusCode = 200;
 
-      fs.readFile(dir + pathname, function (err, data) {
+      fs.readFile(rootDir + pathname, function (err, data) {
         if (err) {
           res.writeHead(404);
           res.end(JSON.stringify(err));
@@ -52,18 +55,30 @@ class GUI {
     });
   }
 
-  static startWebSocketServer(dir) {
+  static startWebSocketServer(rootDir, reloadCallback, navigateCallback) {
     const server = new WebSocket.Server({ port: WEB_SOCKET_SERVER_PORT });
 
     server.on('connection', ws => {
       console.log(`web-socket server running at http://${hostname}:${WEB_SOCKET_SERVER_PORT}/`);
       ws.on('message', message => {
-        const config = JSON.parse(message);
-        this.config = config;
-        fs.writeFileSync(`${dir}/${CONFIGURATION_FILE}`, JSON.stringify(config, null, 2));
+        const messageData = JSON.parse(message);
+        switch (messageData.type) {
+          case WEB_SOCKET_MESSAGE_TYPE_CONFIG:
+            this.config = messageData.config;
+            fs.writeFileSync(`${rootDir}/${CONFIGURATION_FILE}`, JSON.stringify(messageData.config, null, 2));
+            break;
+          case WEB_SOCKET_MESSAGE_TYPE_RELOAD:
+            reloadCallback();
+            break;
+          case WEB_SOCKET_MESSAGE_TYPE_NAVIGATE:
+            navigateCallback(messageData.url);
+            break;
+          default:
+            console.error('Invalid message type specified.');
+        }
       });
 
-      const configJson = fs.readFileSync(`${dir}/${CONFIGURATION_FILE}`, 'utf-8');
+      const configJson = fs.readFileSync(`${rootDir}/${CONFIGURATION_FILE}`, 'utf-8');
 
       try {
         const config = JSON.parse(configJson);

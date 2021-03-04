@@ -17,15 +17,26 @@ const {
 class ModifyChromeRepsonse {
   constructor() {
     this.config = null;
+    this.browser = null;
+    this.reloadCallback = this.reloadCallback.bind(this);
+    this.navigateCallback = this.navigateCallback.bind(this);
 
     if (process.argv.includes('--gui')) {
-      setTimeout(() => gui.launch(__dirname), 1000);
+      setTimeout(() => gui.launch(__dirname, this.reloadCallback, this.navigateCallback), 1000);
     }
   }
 
   async fetchResource(uri) {
     const data = await fetch.auto(uri);
     return data.length ? data[0] : '';
+  }
+
+  reloadCallback() {
+    this.browser && this.browser.reload({ ignoreCache: true });
+  }
+
+  navigateCallback(url) {
+    this.browser && this.browser.navigate({ url });
   }
 
   async main(config) {
@@ -42,7 +53,10 @@ class ModifyChromeRepsonse {
 
     const client = await chromeRemote({ port: chrome.port });
 
-    const { Runtime, Network } = client;
+    const { Page, Runtime, Network } = client;
+
+    this.browser = Page;
+    console.log('this.browser', this.browser);
 
     await Promise.all([Runtime.enable(), Network.enable()]);
 

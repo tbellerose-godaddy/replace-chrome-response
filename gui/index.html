@@ -18,12 +18,19 @@
     
     let config = null;
     webSocket.onmessage = (e) => {
-      const message = JSON.parse(e.data);
       config = JSON.parse(e.data);
     }
 
-    const handleOnConfigChange = (config) => {
-      webSocket.send(JSON.stringify(config));
+    const handleConfigChange = (config) => {
+      webSocket.send(JSON.stringify({ type: constants.WEB_SOCKET_MESSAGE_TYPE_CONFIG, config }));
+    }
+
+    const handleReload = () => {
+      webSocket.send(JSON.stringify({ type: constants.WEB_SOCKET_MESSAGE_TYPE_RELOAD }));
+    }
+
+    const handleNavigate = (url) => {
+      webSocket.send(JSON.stringify({ type: constants.WEB_SOCKET_MESSAGE_TYPE_NAVIGATE, url }));
     }
   </script>
 </head>
@@ -37,7 +44,12 @@
   <script src="/gui/components/App.jsx" type="text/babel"></script>
   <script type="text/babel">
   ReactDOM.render(
-    <App config={config} onConfigChange={handleOnConfigChange} />,
+    <App 
+      config={config}
+      onConfigChange={handleConfigChange}
+      onReload={handleReload}
+      onNavigate={handleNavigate}
+    />,
     document.getElementById('root')
   );
   </script>
