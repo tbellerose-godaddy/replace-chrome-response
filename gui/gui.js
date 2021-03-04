@@ -55,7 +55,7 @@ class GUI {
     });
   }
 
-  static startWebSocketServer(rootDir, reloadCallback, navigateCallback) {
+  static startWebSocketServer(rootDir, configChangeCallback, reloadCallback, navigateCallback) {
     const server = new WebSocket.Server({ port: WEB_SOCKET_SERVER_PORT });
 
     server.on('connection', ws => {
@@ -64,7 +64,7 @@ class GUI {
         const messageData = JSON.parse(message);
         switch (messageData.type) {
           case WEB_SOCKET_MESSAGE_TYPE_CONFIG:
-            this.config = messageData.config;
+            configChangeCallback(messageData.config);
             fs.writeFileSync(`${rootDir}/${CONFIGURATION_FILE}`, JSON.stringify(messageData.config, null, 2));
             break;
           case WEB_SOCKET_MESSAGE_TYPE_RELOAD:

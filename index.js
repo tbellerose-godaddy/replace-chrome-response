@@ -18,17 +18,22 @@ class ModifyChromeRepsonse {
   constructor() {
     this.config = null;
     this.browser = null;
+    this.configChangeCallback = this.configChangeCallback.bind(this);
     this.reloadCallback = this.reloadCallback.bind(this);
     this.navigateCallback = this.navigateCallback.bind(this);
 
     if (process.argv.includes('--gui')) {
-      setTimeout(() => gui.launch(__dirname, this.reloadCallback, this.navigateCallback), 1000);
+      setTimeout(() => gui.launch(__dirname, this.configChangeCallback, this.reloadCallback, this.navigateCallback), 1000);
     }
   }
 
   async fetchResource(uri) {
     const data = await fetch.auto(uri);
     return data.length ? data[0] : '';
+  }
+
+  configChangeCallback(config) {
+    this.config = config;
   }
 
   reloadCallback() {
