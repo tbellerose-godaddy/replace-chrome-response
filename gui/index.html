@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Replace Chrome Response - Settings</title>
+  <style>
+    body {
+      background-color: #ccc;
+    }
+  </style>
+  <script src="/constants.js"></script>
+  <script> 
+    const webSocketServerUrl = `ws://localhost:${constants.WEB_SOCKET_SERVER_PORT}`
+    const webSocket = new WebSocket(webSocketServerUrl)
+    
+    webSocket.onerror = (error) => {
+      console.log(`WebSocket error: ${error}`)
+    }
+    
+    let config = null;
+    webSocket.onmessage = (e) => {
+      const message = JSON.parse(e.data);
+      config = JSON.parse(e.data);
+    }
+
+    const handleOnConfigChange = (config) => {
+      webSocket.send(JSON.stringify(config));
+    }
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <script src="https://unpkg.com/styled-components@4.0.1/dist/styled-components.min.js"></script>
+  <script src="/gui/components/Config.jsx" type="text/babel"></script>
+  <script src="/gui/components/App.jsx" type="text/babel"></script>
+  <script type="text/babel">
+  ReactDOM.render(
+    <App config={config} onConfigChange={handleOnConfigChange} />,
+    document.getElementById('root')
+  );
+  </script>
+</body>
+</html>

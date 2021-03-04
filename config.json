@@ -1,0 +1,25 @@
+{
+  "startingUrl": "https://www.dev-godaddy.com/help/contact-us?connector=true&bot=SupportBot",
+  "rules": [
+    {
+      "match": "https://img1.wsimg.com/liveengage/v2/tag/3.4.2/liveengage.js",
+      "replace": "/Users/jlawson/dev/liveengage-tag/dist/liveengage.js",
+      "enabled": false
+    },
+    {
+      "match": "https://img1.wsimg.com/liveengage/v2/tag/3.4.2/liveengage.js",
+      "replace": "https://img1.wsimg.com/liveengage/v2/tag/3.3.3/liveengage.js",
+      "enabled": false
+    },
+    {
+      "match": "https://img1.wsimg.com/liveengage/v2/tag/3.4.1/liveengage.js",
+      "replace": "/Users/jlawson/dev/liveengage-tag/dist/liveengage.js",
+      "enabled": true
+    },
+    {
+      "match": "https://img1.test-wsimg.com/liveengage/v2/tag/3.4.2/liveengage.js",
+      "replace": "/Users/jlawson/dev/liveengage-tag/dist/liveengage.js",
+      "enabled": true
+    }
+  ]
+}
