@@ -56,7 +56,6 @@ class ModifyChromeRepsonse {
     const { Page, Runtime, Network } = client;
 
     this.browser = Page;
-    console.log('this.browser', this.browser);
 
     await Promise.all([Runtime.enable(), Network.enable()]);
 
