@@ -22,9 +22,9 @@ const {
 const hostname = '127.0.0.1';
 
 class GUI {
-  static launch(rootDir, reloadCallback, navigateCallback) {
+  static launch(rootDir, configChangeCallback, reloadCallback, navigateCallback) {
     GUI.startHttpServer(rootDir);
-    GUI.startWebSocketServer(rootDir, reloadCallback, navigateCallback);
+    GUI.startWebSocketServer(rootDir, configChangeCallback, reloadCallback, navigateCallback);
     GUI.launchChrome();
   }
 
